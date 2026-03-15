@@ -1,0 +1,40 @@
+# 海康相机 ROS 2 参数配置（已按 create_camera_image_pub.cpp 清理）
+# 说明：
+# 1) cam_sn / ImageNodeNum 是节点直接读取的参数。
+# 2) 其余参数会被 create_camera_image_pub 透传到 SDK（setCameraParameterbyString）。
+# 3) 如果某参数当前相机不支持，程序会打印 warning 并跳过。
+
+/**:
+  ros__parameters:
+    # 相机序列号。留空或 "None" 时打开第一台相机。
+    cam_sn: "None"
+
+    # SDK 图像预存储队列（Image Node Num）。
+    # 实时性优先建议 3~10；这里按你的要求默认设为 10。
+    ImageNodeNum: 5
+
+    # ================================
+    # 已验证常用参数（来自 camera_params_test / 当前工程常用设置）
+    # ================================
+
+    # 分辨率与 ROI
+    Width: 1000
+    Height: 1000
+    OffsetX: 50
+    OffsetY: 50
+
+    # 曝光与增益
+    ExposureTime: 80000.0
+    Gain: 25.0
+
+    # 像素格式（彩色推荐 BayerRG8）
+    PixelFormat: "BayerRG8"
+
+    # 镜像与触发模式
+    ReverseX: False
+    TriggerMode: "Off"
+
+    # 帧率控制（相机支持时有效）
+    AcquisitionFrameRateEnable: True
+    AcquisitionFrameRate: 60.0
+  

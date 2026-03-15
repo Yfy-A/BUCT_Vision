@@ -1,0 +1,52 @@
+detector_node:
+  ros__parameters:
+    # 订阅的原始图像话题
+    image_topic: '/camera/image_raw'
+
+    # 发布目标检测结果的话题
+    target_topic: '/vision/target_info'
+
+    # 发布带画框的目标可视化图像话题
+    target_image_topic: '/vision/target_image'
+
+    # 订阅与发布使用的队列深度
+    queue_size: 10
+ 
+    # 使用的 TensorRT engine 文件名
+    engine_file: 'RM_Red_Vision_INT8.engine'
+
+    # 是否发布目标可视化图像
+    target_image_enabled: true
+
+    # YOLO 推理置信度阈值
+    conf_thresh: 0.25
+
+    # NMS IoU 阈值
+    nms_thresh: 0.45
+
+    # 类别名称列表 (索引即为 class_id，根据实际训练模型修改)
+    class_names:  ['red_1', 'red_3', 'red_4', 'red_sentry']
+
+    # ================================
+    # 卡尔曼滤波预测参数
+    # ================================
+    # 过程噪声 (越小表示越信任数学运动模型预测)
+    kf_process_noise: 0.1
+
+    # 测量噪声 (越小表示越信任YOLO检测结果)
+    kf_measurement_noise: 0.001
+
+    # 丢失目标后，最大允许进行卡尔曼预测的帧数
+    kf_max_missed_frames: 50
+
+    # 目标关联门控：中心点最大距离阈值（像素）
+    association_max_distance: 120.0
+
+    # 目标关联门控：最小 IoU（与 KF 预测框）
+    association_min_iou: 0.05
+
+    # 是否要求关联目标类别与上一帧目标一致
+    association_require_same_class: False
+
+    # 每 N 帧输出一次累计耗时统计日志
+    perf_log_interval: 30
