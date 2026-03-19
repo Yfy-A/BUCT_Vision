@@ -4,7 +4,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include <cv_bridge/cv_bridge.h>
-#include <opencv2/video/tracking.hpp>
 #include <opencv2/imgproc.hpp>
 
 #include <rm_interfaces/msg/target.hpp>
@@ -29,10 +28,8 @@ private:
   void image_callback(const sensor_msgs::msg::Image::SharedPtr msg);
   std::string resolve_engine_path();
   std::optional<cv::Mat> to_bgr_image(const sensor_msgs::msg::Image::SharedPtr & msg);
-  cv::Mat draw_target_overlay(const cv::Mat & frame, const Detection * det, bool is_predicted);
+  cv::Mat draw_target_overlay(const cv::Mat & frame, const Detection * det);
   std::string class_name_of(int class_id) const;
-  void update_kf_transition(float dt);
-  static float bbox_iou(const Detection & a, const Detection & b);
 
   // TensorRT YOLO 推理引擎
   std::unique_ptr<TrtYolo> yolo_;
@@ -55,23 +52,7 @@ private:
   float conf_thresh_;
   float nms_thresh_;
 
-  // 卡尔曼滤波
-  cv::KalmanFilter kf_;
-  bool kf_initialized_;
-  int missed_frames_;
-  int max_missed_frames_;
-  double kf_process_noise_;
-  double kf_measurement_noise_;
-  std::string last_target_class_;
-
-  // 目标关联参数
-  double association_max_distance_;
-  double association_min_iou_;
-  bool association_require_same_class_;
-
-  // 时间步与性能统计
-  bool has_last_stamp_{false};
-  rclcpp::Time last_stamp_;
+  // 性能统计
   int perf_log_interval_;
   std::size_t perf_frame_count_{0};
   double perf_total_ms_sum_{0.0};

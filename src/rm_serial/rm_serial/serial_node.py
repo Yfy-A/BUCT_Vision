@@ -239,8 +239,8 @@ class SerialNode(Node):
             self.ser.write(frame)
             self.sent_count += 1
 
-            if self.log_hex_frame:
-                self.get_logger().info(f'发送帧: {frame.hex(" ")}')
+            # if self.log_hex_frame:
+            #     self.get_logger().info(f'发送帧: {frame.hex(" ")}')
                 
 
             if self.sent_count % self.stats_interval == 0:
@@ -265,6 +265,24 @@ class SerialNode(Node):
 
     def destroy_node(self):
         """节点析构时释放串口资源。"""
+        # if self.ser is not None and self.ser.is_open:
+        #     self.get_logger().info('已经清零')
+        #     self.default_class_id = 0
+        #     payload = struct.pack(
+        #     '<fffBB',
+        #     float(0),
+        #     float(0),
+        #     float(0),
+        #     self.default_class_id,
+        #     0,
+        # )
+    
+        
+        #     check = 0
+
+        
+        #     frame = bytes([self.header_byte]) + payload + bytes([check, self.footer_byte])
+        #     self.ser.write(frame)
         self._close_serial()
         super().destroy_node()
 
@@ -277,6 +295,7 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
+        
         node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()

@@ -16,7 +16,7 @@ detector_node:
     engine_file: 'RM_Red_Vision_INT8.engine'
 
     # 是否发布调试图像
-    debug_image_enabled: false
+    debug_image_enabled: true
 
 
 
@@ -47,11 +47,11 @@ detector_node:
     opencv_corners_vis_enabled: true
 
     # 四角点可视化圆点半径（像素）
-    opencv_corners_vis_radius: 5
+    opencv_corners_vis_radius: 10
 
     # 阈值 profile 模式: manual | auto | indoor | outdoor | match
     # auto: 根据图像平均亮度在 indoor/outdoor/match 间自动切换
-    profile_mode: 'auto'
+    profile_mode: 'match'
     profile_switch_interval_frames: 10
     profile_auto_brightness_low: 90.0
     profile_auto_brightness_high: 150.0
@@ -106,19 +106,19 @@ detector_node:
     match_light_max_aspect_ratio: 20.0
     match_light_max_angle_diff_deg: 80.0
     match_light_max_center_y_diff_ratio: 2.0
-    match_light_min_pair_gap_ratio: 3.0
+    match_light_min_pair_gap_ratio: 2.0
     match_light_max_pair_gap_ratio: 8.5
 
     # 相机内参矩阵 (3x3 展平，按行)
     # fx, 0, cx,
     # 0, fy, cy,
     # 0,  0,  1
-    camera_matrix: [2376.61984,    0.     ,  742.78233,
-            0.     , 2378.18117,  554.24903,
+    camera_matrix: [2394.90871,    0.     ,  690.30462,
+            0.     , 2395.12435,  530.38908,
             0.     ,    0.     ,    1.     ]
 
     # 畸变系数 (k1, k2, p1, p2, k3)
-    dist_coeffs: [-0.031696, 0.133747, -0.000740, -0.000682, 0.000000]
+    dist_coeffs: [-0.031623, -0.036022, -0.004409, -0.002115, 0.000000]
 
     # 装甲板物理尺寸 (米)
     armor_width_m: 0.135
@@ -142,21 +142,42 @@ detector_node:
     cam_to_gimbal_rpy_deg: [0.0, 0.0, 0.0]
 
     # 相机系 -> 云台系平移（x, y, z，单位：米）
-    cam_to_gimbal_t_xyz_m: [0.0, 0.0, 0.0]
+    #  x 控制左右0.12为中间值   
+    #  y
+    cam_to_gimbal_t_xyz_m: [0.12 , -0.04, 0.00]
 
     # 弹道补偿参数
     ballistic_enabled: true
-    projectile_speed_mps: 28.0
+    projectile_speed_mps: 20.0
     gravity_mps2: 9.81
 
     # 云台零位偏置（角度制，单位：度）
     yaw_zero_offset_deg: 0.0
     pitch_zero_offset_deg: 0.0
 
+    # ================================
+    # 3D 卡尔曼滤波预瞄参数
+    # ================================
+    # 是否启用预瞄 (false 时仍运行 KF 平滑，但 total_lead = 0)
+    predictor_enabled: true
 
+    # 过程噪声加速度强度 (m/s^2)^2, 越大越信任观测、越小越平滑
+    # 典型值: 2~8, 目标加速度变化剧烈时调大
+    predictor_process_noise_accel: 4.0
 
+    # PnP 测量噪声方差 (m^2), 越小越信任 PnP 结果
+    # 典型值: 0.001~0.02, PnP 抖动严重时调大 0.005
+    predictor_measurement_noise: 0.02
 
+    # 目标丢失后最大外推帧数 (超出后发布无效指令)
+    predictor_max_lost_frames: 12
+  
+    # 目标重捕获距离阈值 (m), 观测偏离预测超过此值则重置 KF
+    predictor_reacquire_max_dist: 0.5
 
+    # 云台响应延迟 (秒), 从视觉出指令到云台机械响应的总延迟
+    # 包含: 通信延迟 + 电机响应 + 控制环延迟, 需实测标定
+    gimbal_response_delay_s: 0.22
 
     # ================================
     # 性能统计参数
@@ -171,24 +192,3 @@ detector_node:
     perf_warmup_frames: 100
 
 
-
-
-
-
-
-
-
-    # ================================
-    # 卡尔曼滤波预测参数
-    # ================================
-    # 过程噪声（越小表示越信任数学运动模型预测）
-    # 基准值0.01
-    kf_process_noise: 0.01
-    
-    # 测量噪声（越小表示越信任YOLO检测结果）
-    #基准值 0.1
-    kf_measurement_noise: 0.1
-    
-    # 丢失目标后，最大允许进行卡尔曼预测的帧数
-    #基准值20
-    kf_max_missed_frames: 0

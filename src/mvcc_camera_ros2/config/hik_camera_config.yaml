@@ -18,17 +18,18 @@
     # ================================
 
     # 分辨率与 ROI
-    Width: 1000
-    Height: 1000
+    Width: 1080
+    Height: 1080
     OffsetX: 50
     OffsetY: 50
 
     # 曝光与增益
-    ExposureTime: 80000.0
+    ExposureTime: 18000.0
     Gain: 25.0
 
     # 像素格式（彩色推荐 BayerRG8）
     PixelFormat: "BayerRG8"
+    
 
     # 镜像与触发模式
     ReverseX: False
