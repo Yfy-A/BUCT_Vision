@@ -1,0 +1,30 @@
+# ROS 2 编译生成的文件夹（绝对不能提交）
+build/
+install/
+log/
+
+# 隐藏的系统和编辑器配置文件
+.vscode/
+.idea/
+*.swp
+*~
+
+# C++ 编译产生的中间文件
+*.o
+*.so
+*.a
+CMakeCache.txt
+CMakeFiles/
+
+# Python 缓存文件
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 临时文件和标志文件
+--*
+
+# 相机标定数据（如果不需要提交）
+calibrationdata/
+calibrationdata (1)/
