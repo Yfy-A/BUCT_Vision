@@ -1,0 +1,212 @@
+detector_node:
+  ros__parameters:
+    # 订阅的原始图像话题
+    image_topic: '/camera/image_raw'
+
+    # 发布目标检测结果的话题
+    target_topic: '/vision/target_info'
+
+    # 发布带画框和 FPS 的调试图像话题
+    debug_image_topic: '/vision/target_image'
+
+    # 订阅与发布使用的队列深度
+    queue_size: 5
+
+    # ================================
+    # QoS (Quality of Service) 配置
+    # ================================
+    # 图像订阅 QoS 可靠性: 'best_effort' | 'reliable'
+    # best_effort: 不保证送达，低延迟，适合高频传感器数据（推荐）
+    # reliable: 保证送达，可能因重传导致 CPU 高负载时阻塞
+    image_qos_reliability: 'best_effort'
+
+    # 图像订阅历史队列深度（KEEP_LAST 模式）
+    # 1: 仅保留最新一帧，最低延迟（推荐）
+    # 2-10: 适度缓冲，应对短时处理延迟
+    image_qos_history_depth: 1
+
+    # 图像订阅持久性: 'volatile' | 'transient_local'
+    # volatile: 只对订阅后的消息负责（推荐）
+    # transient_local: 保留最近的消息给新订阅者
+    image_qos_durability: 'volatile'
+
+    # 使用的 TensorRT engine 文件名
+    engine_file: 'RM_Red_Vision_INT8.engine'
+
+    # 是否发布调试图像
+    debug_image_enabled: true
+
+
+
+
+
+
+
+
+
+
+
+    # ================================
+    # OpenCV 灯条角点提取与 PnP 参数
+    # ================================
+    # 发布 PnP 结果的话题 (Vector3: x=yaw[deg], y=pitch[deg], z=distance[m])
+    pnp_topic: '/vision/pnp_info'
+
+    # 发布给串口节点/控制板使用的云台误差角话题
+    gimbal_cmd_topic: '/vision/gimbal_cmd'
+
+    # 是否开启灯条法提取装甲板四角点
+    armor_corner_enabled: true
+
+    # 是否开启 PnP 解算
+    pnp_enabled: true
+
+    # 是否在 debug 图上绘制 OpenCV 提取到的四角点
+    opencv_corners_vis_enabled: true
+
+    # 四角点可视化圆点半径（像素）
+    opencv_corners_vis_radius: 10
+
+    # 阈值 profile 模式: manual | auto | indoor | outdoor | match
+    # auto: 根据图像平均亮度在 indoor/outdoor/match 间自动切换
+    profile_mode: 'match'
+    profile_switch_interval_frames: 10
+    profile_auto_brightness_low: 90.0
+    profile_auto_brightness_high: 150.0
+
+    # 在 YOLO 框基础上扩展 ROI 的比例
+    # 当前画面目标较小且有拖影，适当扩大 ROI 提升角点召回
+    roi_expand_ratio: 0.1
+
+    # 灯条二值化阈值 (亮度阈值)
+    # 画面偏暗并伴随曝光波动，降低阈值先保证可检出
+    light_binary_thresh: 120
+
+    # 灯条最小轮廓面积
+    light_min_area: 20.0
+
+    # 灯条长宽比约束 (长边/短边)
+    # 拖影时形状可能接近方形或拉伸，先放宽区间
+    light_min_aspect_ratio: 0.5 
+    light_max_aspect_ratio: 20.0
+
+    # 两根灯条配对约束
+    # 先提高容忍度以确保能出角点，再逐步收紧
+    light_max_angle_diff_deg: 80.0
+    light_max_center_y_diff_ratio: 2.0
+    light_min_pair_gap_ratio: 3.0
+    light_max_pair_gap_ratio: 8.5
+
+    # indoor profile（室内/偏暗）
+    indoor_light_binary_thresh: 120
+    indoor_light_min_area: 20.0
+    indoor_light_min_aspect_ratio: 0.5
+    indoor_light_max_aspect_ratio: 20.0
+    indoor_light_max_angle_diff_deg: 80.0
+    indoor_light_max_center_y_diff_ratio: 2.0
+    indoor_light_min_pair_gap_ratio: 3.0
+    indoor_light_max_pair_gap_ratio: 8.5
+
+    # outdoor profile（室外/高亮）
+    outdoor_light_binary_thresh: 120
+    outdoor_light_min_area: 18.0
+    outdoor_light_min_aspect_ratio: 0.5
+    outdoor_light_max_aspect_ratio: 20.0
+    outdoor_light_max_angle_diff_deg: 80.0
+    outdoor_light_max_center_y_diff_ratio: 2.0
+    outdoor_light_min_pair_gap_ratio: 3.0
+    outdoor_light_max_pair_gap_ratio: 8.5
+
+    # match profile（比赛默认）
+    match_light_binary_thresh: 120
+    match_light_min_area: 20.0
+    match_light_min_aspect_ratio: 0.5
+    match_light_max_aspect_ratio: 20.0
+    match_light_max_angle_diff_deg: 80.0
+    match_light_max_center_y_diff_ratio: 2.0
+    match_light_min_pair_gap_ratio: 2.0
+    match_light_max_pair_gap_ratio: 8.5
+
+    # 相机内参矩阵 (3x3 展平，按行)
+    # fx, 0, cx,
+    # 0, fy, cy,
+    # 0,  0,  1
+    camera_matrix: [2394.90871,    0.     ,  690.30462,
+            0.     , 2395.12435,  530.38908,
+            0.     ,    0.     ,    1.     ]
+
+    # 畸变系数 (k1, k2, p1, p2, k3)
+    dist_coeffs: [-0.031623, -0.036022, -0.004409, -0.002115, 0.000000]
+
+    # 装甲板物理尺寸 (米)
+    armor_width_m: 0.135
+    armor_height_m: 0.055
+
+    # 大小装甲板几何尺寸 (米)
+    armor_width_small_m: 0.135
+    armor_height_small_m: 0.055
+    armor_width_large_m: 0.230
+    armor_height_large_m: 0.055
+
+    # 装甲板大小自动切换
+    armor_size_auto_enabled: true
+    armor_size_default: 'small'
+    # 当角点宽高比/灯条间距比超过该阈值时判定为 large
+    armor_size_ratio_threshold: 3.0
+    # 可按类别强制指定大小，格式: class_name:small|large
+    armor_class_size_pairs: ['hero:large', 'infantry:small']
+
+    # 相机系 -> 云台系外参（roll, pitch, yaw，单位：度）
+    cam_to_gimbal_rpy_deg: [0.0, 0.0, 0.0]
+
+    # 相机系 -> 云台系平移（x, y, z，单位：米）
+    #  x 控制左右0.12为中间值   
+    #  y
+    cam_to_gimbal_t_xyz_m: [0.12 , -0.04, 0.00]
+
+    # 弹道补偿参数
+    ballistic_enabled: true
+    projectile_speed_mps: 20.0
+    gravity_mps2: 9.81
+
+    # 云台零位偏置（角度制，单位：度）
+    yaw_zero_offset_deg: 0.0
+    pitch_zero_offset_deg: 0.0
+
+    # ================================
+    # 3D 卡尔曼滤波预瞄参数
+    # ================================
+    # 是否启用预瞄 (false 时仍运行 KF 平滑，但 total_lead = 0)
+    predictor_enabled: true
+
+    # 过程噪声加速度强度 (m/s^2)^2, 越大越信任观测、越小越平滑
+    # 典型值: 2~8, 目标加速度变化剧烈时调大
+    predictor_process_noise_accel: 4.0
+
+    # PnP 测量噪声方差 (m^2), 越小越信任 PnP 结果
+    # 典型值: 0.001~0.02, PnP 抖动严重时调大 0.005
+    predictor_measurement_noise: 0.02
+
+    # 目标丢失后最大外推帧数 (超出后发布无效指令)
+    predictor_max_lost_frames: 12
+  
+    # 目标重捕获距离阈值 (m), 观测偏离预测超过此值则重置 KF
+    predictor_reacquire_max_dist: 0.5
+
+    # 云台响应延迟 (秒), 从视觉出指令到云台机械响应的总延迟
+    # 包含: 通信延迟 + 电机响应 + 控制环延迟, 需实测标定
+    gimbal_response_delay_s: 0.22
+
+    # ================================
+    # 性能统计参数
+    # ================================
+    # 是否打印分阶段耗时统计（转换/推理/后处理/发布）
+    perf_log_enabled: false
+
+    # 每累计多少帧打印一次平均耗时
+    perf_log_interval: 30
+
+    # 预热帧数（前 N 帧不计入统计，避开 TensorRT 初次建上下文抖动）
+    perf_warmup_frames: 100
+
+

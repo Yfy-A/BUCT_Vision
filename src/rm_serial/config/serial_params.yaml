@@ -1,0 +1,38 @@
+serial_node:
+  ros__parameters:
+    # 输入话题（由 rm_vision/detector_node 发布）
+    gimbal_cmd_topic: '/vision/gimbal_cmd'
+    queue_size: 20
+
+    # 串口基础配置
+    # 已在 Jetson 上验证可用的串口一般是 /dev/ttyTHS1；若使用 USB 转串口可改为 /dev/ttyUSB0
+    enabled: true
+    port: '/dev/ttyCH341USB0'
+    baud_rate: 9600
+    timeout_sec: 0.01
+    write_timeout_sec: 0.01
+    reconnect_interval_sec: 1.0
+
+    # 协议格式
+    # 帧结构: [HEADER][yaw_err_deg(float32)][pitch_err_deg(float32)][distance_m(float32)][class_id(uint8)][valid(uint8)][checksum][FOOTER]
+    header_byte: 90      # 0x5A
+    footer_byte: 165     # 0xA5
+    checksum_mode: 'crc8'  # crc8 | sum8
+    crc_poly: 7          # 0x07
+    crc_init: 0          # 0x00
+
+    # 类别映射
+    # 重要: 必须使用 "类别名:ID" 格式；类别名需要与 detector_node 发布的 class_name 完全一致。
+    # 若不匹配，serial_node 会回退为 default_class_id。
+    default_class_id: 0
+    class_id_pairs:
+      - 'red_robot:1'
+      - 'blue_robot:2'
+      - 'red_armor:3'
+      - 'blue_armor:4'
+
+    # 行为控制
+    # send_invalid_target_frame=true 时，目标丢失也会发 valid=0 帧，便于下位机清空上次目标状态。
+    send_invalid_target_frame: true
+    log_hex_frame: true
+    stats_interval: 100

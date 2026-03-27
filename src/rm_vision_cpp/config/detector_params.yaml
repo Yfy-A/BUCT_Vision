@@ -1,0 +1,31 @@
+detector_node:
+  ros__parameters:
+    # 订阅的原始图像话题
+    image_topic: '/camera/image_raw'
+
+    # 发布目标检测结果的话题
+    target_topic: '/vision/target_info'
+
+    # 发布带画框的目标可视化图像话题
+    target_image_topic: '/vision/target_image'
+
+    # 订阅与发布使用的队列深度
+    queue_size: 10
+ 
+    # 使用的 TensorRT engine 文件名
+    engine_file: 'RM_Red_Vision_INT8.engine'
+
+    # 是否发布目标可视化图像
+    target_image_enabled: true
+
+    # YOLO 推理置信度阈值
+    conf_thresh: 0.25
+
+    # NMS IoU 阈值
+    nms_thresh: 0.45
+
+    # 类别名称列表 (索引即为 class_id，根据实际训练模型修改)
+    class_names:  ['red_1', 'red_3', 'red_4', 'red_sentry']
+
+    # 每 N 帧输出一次累计耗时统计日志
+    perf_log_interval: 30

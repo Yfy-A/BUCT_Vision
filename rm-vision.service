@@ -1,0 +1,19 @@
+[Unit]
+Description=RM Vision Auto Start
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=yao
+WorkingDirectory=/home/yao/RM_WS
+Environment=HOME=/home/yao
+ExecStart=/bin/bash /home/yao/RM_WS/start_vision_python.sh camera
+Restart=on-failure
+RestartSec=3
+KillSignal=SIGINT
+TimeoutStopSec=15
+ExecStop=/bin/kill -s SIGINT $MAINPID
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+video_node:
+  ros__parameters:
+    # ------------------- 相机参数设置 -------------------
+    # 是否使用本地视频文件替代真实摄像头进行调试 (true/false)
+    use_video_file: true
+    
+    # 本地视频文件的绝对路径 (只有在 use_video_file 为 true 时才会生效)
+    # 例如：'/home/yao/RM_WS/video.mp4'
+    video_path: '/home/yao/RM_Projects/Env_Test/Videos/Red_Video2.mp4'
+    
+    # 硬件摄像头设备的 ID 编号 (例如：0 代表硬件设备 /dev/video0)
+    device_id: 0
+    
+    # 相机读取的期望采集帧率 (FPS)
+    fps: 30.0
